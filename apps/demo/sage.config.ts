@@ -2,21 +2,21 @@ import { defineSageConfig } from "astro-sage";
 
 export default defineSageConfig({
   site: {
-    url: "https://astro-sage.chintak.sh/",
-    title: "AstroSage",
+    url: "https://juan131ng.zeroarea.top/",
+    title: "Juan131ng",
     description:
-      "A readability-first Astro blog theme: serif type, warm paper, and a pinned table of contents.",
-    author: "Ada Lovelace",
-    profile: "https://example.com",
+      "在结构与美之间，搭一座安静的桥。记录学习笔记、摄影与自我相处的方式。",
+    author: "Juan131ng",
+    profile: "https://github.com/Juan131ng",
     ogImage: "default-og.jpg",
     lang: "en",
-    timezone: "UTC",
+    timezone: "Asia/Shanghai",
     dir: "ltr",
   },
   home: {
-    title: "AstroSage",
+    title: "在结构与美之间，搭一座安静的桥。",
     intro:
-      "A quiet, warm theme for long-form technical writing. Serif type set for reading, math and code that look like they belong, and a table of contents that keeps its place.",
+      "Hola，这里卷饼，大二在校生与摄影爱好者。热爱把知识酿成清晰的系统，用文字记录那些抵达前的微光与耐心。一切都在路上：摄影、代码、与自我相处的方式。",
   },
   // GitHub-backed comments; works on any static host. Needs the utterances
   // app installed on the repo: https://github.com/apps/utterances
@@ -38,9 +38,9 @@ export default defineSageConfig({
     search: "pagefind",
   },
   socials: [
-    // Sample links: point these at your own profiles.
-    { name: "github", url: "https://github.com" },
-    { name: "x", url: "https://x.com" },
+    { name: "github", url: "https://github.com/Juan131ng" },
+    { name: "x", url: "https://x.com/danny131ng" },
+    { name: "mail", url: "mailto:juan131ng@outlook.com" },
   ],
   // shareLinks: defaults to X, LinkedIn, Bluesky, Reddit, Hacker News and email.
 });

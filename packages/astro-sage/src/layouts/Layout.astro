@@ -22,7 +22,6 @@ const { site } = config;
 // Link only the icons the site actually ships in public/.
 const has = (name: string) => publicFiles.includes(name);
 const icons = {
-  svg: has("favicon.svg"),
   ico: has("favicon.ico"),
   apple: has("apple-touch-icon.png"),
   manifest: has("site.webmanifest"),
@@ -57,13 +56,6 @@ const ogImageType = /\.jpe?g$/i.test(socialImageURL.pathname)
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    {icons.svg && (
-      <link
-        rel="icon"
-        type="image/svg+xml"
-        href={getAssetPath("favicon.svg")}
-      />
-    )}
     {icons.ico && (
       <link rel="icon" href={getAssetPath("favicon.ico")} sizes="any" />
     )}
