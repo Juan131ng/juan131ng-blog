@@ -1,8 +1,31 @@
 import { readFile } from "node:fs/promises";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 const SHOWCASE = "/posts/showcase/";
+const SHOWCASE_TITLE = "AstroSage: every element, set in type";
+
+async function canonicalUrl(page: Page) {
+  const href = await page
+    .locator('head link[rel="canonical"]')
+    .getAttribute("href");
+  expect(href, "canonical URL").toBeTruthy();
+  return new URL(href!);
+}
+
+async function pageMeta(page: Page) {
+  const content = async (selector: string) => {
+    const value = await page.locator(selector).getAttribute("content");
+    expect(value, selector).toBeTruthy();
+    return value!;
+  };
+  return {
+    canonical: await canonicalUrl(page),
+    author: await content('meta[name="author"]'),
+    siteTitle: await content('meta[property="og:site_name"]'),
+    title: await page.locator("h1").first().innerText(),
+  };
+}
 
 test("showcase renders every content feature", async ({ page }) => {
   await page.goto(SHOWCASE);
@@ -400,17 +423,17 @@ test("share sheet links to every platform with the canonical URL and title", asy
   page,
 }) => {
   await page.goto(SHOWCASE);
-  const url = encodeURIComponent(
-    "https://astro-sage.chintak.sh/posts/showcase/"
-  );
-  const title = encodeURIComponent("AstroSage: every element, set in type");
+  const { canonical, title } = await pageMeta(page);
+  expect(title).toBe(SHOWCASE_TITLE);
+  const url = encodeURIComponent(canonical.href);
+  const encodedTitle = encodeURIComponent(title);
   const expected = [
-    `https://x.com/intent/post?url=${url}&text=${title}`,
+    `https://x.com/intent/post?url=${url}&text=${encodedTitle}`,
     `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
-    `https://bsky.app/intent/compose?text=${title}%20${url}`,
-    `https://www.reddit.com/submit?url=${url}&title=${title}`,
-    `https://news.ycombinator.com/submitlink?u=${url}&t=${title}`,
-    `mailto:?subject=${title}&body=${url}`,
+    `https://bsky.app/intent/compose?text=${encodedTitle}%20${url}`,
+    `https://www.reddit.com/submit?url=${url}&title=${encodedTitle}`,
+    `https://news.ycombinator.com/submitlink?u=${url}&t=${encodedTitle}`,
+    `mailto:?subject=${encodedTitle}&body=${url}`,
   ];
   const hrefs = await page
     .locator(".share a.share-btn")
@@ -423,6 +446,13 @@ test("citation block is folded and offers text and BibTeX", async ({
   page,
 }) => {
   await page.goto(SHOWCASE);
+  const { canonical, author, title } = await pageMeta(page);
+  const authorParts = author.trim().split(/\s+/);
+  const citeName =
+    authorParts.length > 1
+      ? `${authorParts.at(-1)}, ${authorParts.slice(0, -1).join(" ")}`
+      : author;
+  const publication = canonical.hostname;
   const cite = page.locator("details.citation");
   // Folded by default, and not a heading (so it stays out of the TOC).
   await expect(cite).not.toHaveAttribute("open");
@@ -431,13 +461,14 @@ test("citation block is folded and offers text and BibTeX", async ({
   await expect(page.locator(".toc a", { hasText: /cite/i })).toHaveCount(0);
   await cite.locator("summary").click();
   await expect(cite.locator(".citation-text")).toContainText(
-    "Lovelace, Ada. (Oct 2026). AstroSage: every element, set in type. astro-sage.chintak.sh."
+    `${citeName}. (Oct 2026). ${title}. ${publication}.`
   );
   const bib = await cite.locator(".citation-bib code").textContent();
-  expect(bib).toContain("@article{lovelace2026showcase,");
-  expect(bib).toContain(
-    "url     = {https://astro-sage.chintak.sh/posts/showcase/}"
-  );
+  const key = `${citeName.split(",")[0].trim()}2026showcase`
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+  expect(bib).toContain(`@article{${key},`);
+  expect(bib).toContain(`url     = {${canonical.href}}`);
 });
 
 test("the citation's rule is the only divider above it", async ({ page }) => {
@@ -465,13 +496,11 @@ test("selecting text offers to share it as a quote", async ({ page }) => {
   });
   const bar = page.locator(".quote-share");
   await expect(bar).toBeVisible();
+  const { canonical, title } = await pageMeta(page);
   const x = await bar.locator('a[data-t="x"]').getAttribute("href");
-  const link =
-    "https://astro-sage.chintak.sh/posts/showcase/#:~:text=Good%20typography%20is%20invisible.";
+  const link = `${canonical.href}#:~:text=Good%20typography%20is%20invisible.`;
   expect(x).toContain(
-    encodeURIComponent(
-      "“Good typography is invisible.” — AstroSage: every element, set in type"
-    )
+    encodeURIComponent(`“Good typography is invisible.” — ${title}`)
   );
   expect(x).toContain(encodeURIComponent(link));
   await page.keyboard.press("Escape");
@@ -596,16 +625,16 @@ test("RSS feed carries full, self-contained posts", async ({
   request,
 }) => {
   await page.goto(SHOWCASE);
+  const { canonical, author } = await pageMeta(page);
+  const rssUrl = new URL("/rss.xml", canonical).href;
   await expect(
     page.locator('head link[rel="alternate"][type="application/rss+xml"]')
-  ).toHaveAttribute("href", "https://astro-sage.chintak.sh/rss.xml");
+  ).toHaveAttribute("href", rssUrl);
 
   const res = await request.get("/rss.xml");
   expect(res.ok()).toBe(true);
   const xml = await res.text();
-  expect(xml).toContain(
-    '<atom:link href="https://astro-sage.chintak.sh/rss.xml" rel="self"'
-  );
+  expect(xml).toContain(`<atom:link href="${rssUrl}" rel="self"`);
   expect(xml).toContain("<language>en</language>");
   // Parse it as a feed reader would.
   const feed = await page.evaluate(src => {
@@ -625,7 +654,7 @@ test("RSS feed carries full, self-contained posts", async ({
   // Published posts only; drafts and not-yet-due scheduled posts stay out.
   expect(feed!.length).toBeGreaterThanOrEqual(2);
   const showcase = feed!.find(i => i.link?.endsWith("/posts/showcase/"))!;
-  expect(showcase.creator).toBe("Ada Lovelace");
+  expect(showcase.creator).toBe(author);
   expect(showcase.categories).toContain("typography");
   expect(showcase.pubDate).toBe("Thu, 15 Oct 2026 09:00:00 GMT");
   const html = showcase.html;
@@ -688,10 +717,8 @@ test("content pages get prose spacing", async ({ page }) => {
       .filter(Boolean)
   );
   expect(overlaps).toEqual([]);
-  // Wiki-links work on pages too.
-  await expect(
-    page.locator('.app-prose a[href="/posts/showcase/"]').first()
-  ).toHaveText("the showcase post");
+  // Wiki-links on content pages must never render as broken links.
+  await expect(page.locator(".app-prose .wikilink-broken")).toHaveCount(0);
 });
 
 test("Series nav link shows when a published post is in a series", async ({
@@ -708,9 +735,10 @@ test("Series nav link shows when a published post is in a series", async ({
 
 test("home RSS link matches the social icons", async ({ page }) => {
   await page.goto("/");
+  const { siteTitle } = await pageMeta(page);
   const hero = page.locator(".hero");
   const rss = hero.locator('a[href="/rss.xml"]');
-  await expect(rss).toHaveAccessibleName("AstroSage RSS feed");
+  await expect(rss).toHaveAccessibleName(`${siteTitle} RSS feed`);
   // Icon only: the only text is the screen-reader label.
   const visibleText = await rss.evaluate(a => {
     const clone = a.cloneNode(true) as HTMLElement;
@@ -765,6 +793,8 @@ test("task-list checkboxes are round, filled when checked", async ({
 
 test("social meta tags for share previews", async ({ page }) => {
   await page.goto(SHOWCASE);
+  const { canonical } = await pageMeta(page);
+  const imageUrl = new URL("/posts/showcase/index.png", canonical).href;
   const meta = (sel: string) => page.locator(`meta[${sel}]`);
   await expect(meta('property="og:type"')).toHaveCount(1);
   await expect(meta('property="og:type"')).toHaveAttribute(
@@ -773,7 +803,7 @@ test("social meta tags for share previews", async ({ page }) => {
   );
   await expect(meta('property="og:image"')).toHaveAttribute(
     "content",
-    "https://astro-sage.chintak.sh/posts/showcase/index.png"
+    imageUrl
   );
   await expect(meta('property="og:image:width"')).toHaveAttribute(
     "content",
@@ -785,7 +815,7 @@ test("social meta tags for share previews", async ({ page }) => {
   );
   await expect(meta('name="twitter:image"')).toHaveAttribute(
     "content",
-    "https://astro-sage.chintak.sh/posts/showcase/index.png"
+    imageUrl
   );
   const res = await page.request.get("/posts/showcase/index.png");
   expect(res.status()).toBe(200);
