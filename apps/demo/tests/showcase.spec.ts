@@ -1,9 +1,7 @@
-import { readFile } from "node:fs/promises";
 import { expect, test, type Page } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 const SHOWCASE = "/posts/showcase/";
-const SHOWCASE_TITLE = "AstroSage: every element, set in type";
 
 async function canonicalUrl(page: Page) {
   const href = await page
@@ -70,6 +68,11 @@ test("no horizontal page overflow", async ({ page }) => {
   expect(overflow).toBeLessThanOrEqual(0);
 });
 
+test("table of contents is hidden on posts by default", async ({ page }) => {
+  await page.goto("/posts/colophon/");
+  await expect(page.locator(".toc-rail, .toc-inline")).toHaveCount(0);
+});
+
 test("TOC rail is pinned and tracks the current section", async ({
   page,
   isMobile,
@@ -127,7 +130,6 @@ for (const theme of ["light", "dark"] as const) {
     await page.addInitScript(t => localStorage.setItem("theme", t), theme);
     await page.goto(SHOWCASE);
     const results = await new AxeBuilder({ page })
-      .exclude("#comments")
       .exclude(".expressive-code") // third-party syntax colours are checked separately
       .analyze();
     expect(results.violations.map(v => `${v.id}: ${v.nodes.length}`)).toEqual(
@@ -151,11 +153,9 @@ test("series, tags, archives, search pages render", async ({ page }) => {
   }
 });
 
-test("social and share icons render", async ({ page }) => {
+test("social profile icons render", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator('footer a[title*="on Github"] svg')).toBeVisible();
-  await page.goto(SHOWCASE);
-  await expect(page.locator(".share a.share-btn svg").first()).toBeAttached();
 });
 
 for (const path of [SHOWCASE]) {
@@ -419,27 +419,15 @@ test("series labels link to the series page", async ({ page }) => {
   );
 });
 
-test("share sheet links to every platform with the canonical URL and title", async ({
-  page,
-}) => {
+test("comments and sharing controls are disabled", async ({ page }) => {
   await page.goto(SHOWCASE);
-  const { canonical, title } = await pageMeta(page);
-  expect(title).toBe(SHOWCASE_TITLE);
-  const url = encodeURIComponent(canonical.href);
-  const encodedTitle = encodeURIComponent(title);
-  const expected = [
-    `https://x.com/intent/post?url=${url}&text=${encodedTitle}`,
-    `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
-    `https://bsky.app/intent/compose?text=${encodedTitle}%20${url}`,
-    `https://www.reddit.com/submit?url=${url}&title=${encodedTitle}`,
-    `https://news.ycombinator.com/submitlink?u=${url}&t=${encodedTitle}`,
-    `mailto:?subject=${encodedTitle}&body=${url}`,
-  ];
-  const hrefs = await page
-    .locator(".share a.share-btn")
-    .evaluateAll(els => els.map(a => a.getAttribute("href")));
-  expect(hrefs).toEqual(expected);
-  await expect(page.locator(".share [data-copy]")).toBeVisible();
+  await expect(page.locator("#comments")).toHaveCount(0);
+  await expect(
+    page.locator(".share, .quote-share, [data-quote-share]")
+  ).toHaveCount(0);
+  await expect(
+    page.locator('script[src*="utteranc.es"], script[src*="giscus.app"]')
+  ).toHaveCount(0);
 });
 
 test("citation block is folded and offers text and BibTeX", async ({
@@ -480,60 +468,6 @@ test("the citation's rule is the only divider above it", async ({ page }) => {
     "border-top-width",
     "1px"
   );
-});
-
-test("selecting text offers to share it as a quote", async ({ page }) => {
-  await page.goto(SHOWCASE);
-  await page.evaluate(() => {
-    const p = document.querySelector("#article > p")!;
-    const text = p.firstChild!;
-    const range = document.createRange();
-    range.setStart(text, 0);
-    range.setEnd(text, "Good typography is invisible.".length);
-    const sel = document.getSelection()!;
-    sel.removeAllRanges();
-    sel.addRange(range);
-  });
-  const bar = page.locator(".quote-share");
-  await expect(bar).toBeVisible();
-  const { canonical, title } = await pageMeta(page);
-  const x = await bar.locator('a[data-t="x"]').getAttribute("href");
-  const link = `${canonical.href}#:~:text=Good%20typography%20is%20invisible.`;
-  expect(x).toContain(
-    encodeURIComponent(`“Good typography is invisible.” — ${title}`)
-  );
-  expect(x).toContain(encodeURIComponent(link));
-  await page.keyboard.press("Escape");
-  await expect(bar).toBeHidden();
-});
-
-test("a selection can be shared as an image card", async ({ page }) => {
-  // Desktop path: without file sharing, the card downloads as a PNG.
-  await page.addInitScript(() => {
-    Object.defineProperty(navigator, "canShare", { value: undefined });
-  });
-  await page.goto(SHOWCASE);
-  await page.evaluate(() => {
-    const text = document.querySelector("#article > p")!.firstChild!;
-    const range = document.createRange();
-    range.setStart(text, 0);
-    range.setEnd(text, "Good typography is invisible.".length);
-    document.getSelection()!.removeAllRanges();
-    document.getSelection()!.addRange(range);
-  });
-  const bar = page.locator(".quote-share");
-  await expect(bar).toBeVisible();
-  const [download] = await Promise.all([
-    page.waitForEvent("download"),
-    bar.locator('button[data-t="image"]').click(),
-  ]);
-  expect(download.suggestedFilename()).toBe("quote.png");
-  const png = await readFile((await download.path())!);
-  expect(png.subarray(1, 4).toString()).toBe("PNG");
-  // 1200×630 at 2×.
-  expect(png.readUInt32BE(16)).toBe(2400);
-  expect(png.readUInt32BE(20)).toBe(1260);
-  await expect(bar.locator(".qs-status")).toHaveText("Image saved");
 });
 
 test("code blocks show their language on the frame", async ({ page }) => {
@@ -666,28 +600,6 @@ test("RSS feed carries full, self-contained posts", async ({
   const urls = [...html.matchAll(/(?:href|src)="([^"]+)"/g)].map(m => m[1]);
   expect(urls.length).toBeGreaterThan(0);
   expect(urls.filter(u => !/^(https?:|mailto:|data:)/.test(u))).toEqual([]);
-});
-
-test("comments load the utterances widget lazily, themed", async ({ page }) => {
-  const loads: string[] = [];
-  await page.route("https://utteranc.es/**", route => {
-    loads.push(route.request().url());
-    return route.fulfill({ contentType: "text/javascript", body: "" });
-  });
-  await page.goto(SHOWCASE);
-  const script = page.locator('#comments script[src*="utteranc.es"]');
-  await expect(script).toHaveCount(0);
-  expect(loads).toEqual([]);
-  await page.locator("#comments").scrollIntoViewIfNeeded();
-  await expect(script).toHaveCount(1);
-  await expect(script).toHaveAttribute("repo", "chintak/astro-sage");
-  await expect(script).toHaveAttribute("issue-term", "pathname");
-  await expect(script).toHaveAttribute("label", "comments");
-  await expect(script).toHaveAttribute(
-    "theme",
-    /^(github-light|gruvbox-dark)$/
-  );
-  expect(loads).toEqual(["https://utteranc.es/client.js"]);
 });
 
 test("og:image:type matches the image file", async ({ page }) => {

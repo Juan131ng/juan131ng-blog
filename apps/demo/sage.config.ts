@@ -5,7 +5,7 @@ export default defineSageConfig({
     url: "https://juan131ng.zeroarea.top/",
     title: "Juan131ng",
     description:
-      "在结构与美之间，搭一座安静的桥。记录学习笔记、摄影与自我相处的方式。",
+      "这里存放一部分我",
     author: "Juan131ng",
     profile: "https://github.com/Juan131ng",
     ogImage: "default-og.jpg",
@@ -14,17 +14,12 @@ export default defineSageConfig({
     dir: "ltr",
   },
   home: {
-    title: "在结构与美之间，搭一座安静的桥。",
+    title: "你好，我是卷饼",
     intro:
-      "Hola，这里卷饼，大二在校生与摄影爱好者。热爱把知识酿成清晰的系统，用文字记录那些抵达前的微光与耐心。一切都在路上：摄影、代码、与自我相处的方式。",
+      "这里存放一部分我。",
   },
-  // GitHub-backed comments; works on any static host. Needs the utterances
-  // app installed on the repo: https://github.com/apps/utterances
-  comments: {
-    provider: "utterances",
-    repo: "chintak/astro-sage",
-    label: "comments",
-  },
+  comments: { provider: false },
+  shareLinks: [],
   posts: { perPage: 8, perIndex: 6, scheduledPostMargin: 15 * 60 * 1000 },
   features: {
     lightAndDarkMode: true,
@@ -42,5 +37,4 @@ export default defineSageConfig({
     { name: "x", url: "https://x.com/danny131ng" },
     { name: "mail", url: "mailto:juan131ng@outlook.com" },
   ],
-  // shareLinks: defaults to X, LinkedIn, Bluesky, Reddit, Hacker News and email.
 });

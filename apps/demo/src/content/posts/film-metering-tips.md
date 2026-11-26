@@ -1,8 +1,8 @@
 ---
 title: "有关胶片摄影测光的 tips"
-description: "从 EV 值的换算逻辑到实战测光技巧：一套在暗光里也能算对的曝光思路，以及福马 100、Portra、Provia 各自的脾气。"
+description: "从EV值的换算逻辑到实战测光技巧"
 pubDatetime: 2025-03-27T09:00:00Z
-tags: ["摄影", "胶片"]
+tags: ["胶片"]
 math: false
 ---
 

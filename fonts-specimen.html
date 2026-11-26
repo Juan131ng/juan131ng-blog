@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>手写字体样张 · Handwriting Specimen</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@400;700&family=Caveat:wght@400..700&family=Gaegu:wght@300;400;700&family=Homemade+Apple&family=Indie+Flower&family=JetBrains+Mono:wght@400;600&family=Kalam:wght@300;400;700&family=Liu+Jian+Mao+Cao&family=Long+Cang&family=Ma+Shan+Zheng&family=Patrick+Hand&family=Permanent+Marker&family=Rock+Salt&family=Shadows+Into+Light&family=ZCOOL+KuaiLe&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@latest/style.css" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e3;
+    --paper2:#fffdf4;
+    --ink:#2b2620;
+    --ink-soft:#6b6254;
+    --red:#c2452d;
+    --tape:rgba(219,197,148,.62);
+    --line:rgba(43,38,32,.16);
+    --sample-size:42px;
+    --wobble:255px 18px 225px 18px / 18px 225px 18px 255px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'LXGW WenKai', serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  /* 点阵纸背景 */
+  body::before{
+    content:'';position:fixed;inset:0;z-index:-1;
+    background:
+      radial-gradient(circle, rgba(43,38,32,.13) 1px, transparent 1.15px) 0 0 / 26px 26px,
+      linear-gradient(180deg, rgba(255,253,244,0) 60%, rgba(238,229,203,.6) 100%);
+  }
+  /* 纸张噪点 */
+  body::after{
+    content:'';position:fixed;inset:0;z-index:99;pointer-events:none;
+    opacity:.05;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+  /* ---------- 页头 ---------- */
+  header{position:relative;padding-top:64px}
+  .seal{
+    position:absolute;top:44px;right:28px;
+    width:58px;height:58px;padding:6px 0;text-align:center;
+    font-family:'Ma Shan Zheng',serif;font-size:20px;line-height:1.15;color:var(--red);
+    border:2.5px solid var(--red);border-radius:6px;
+    transform:rotate(7deg);opacity:.88;user-select:none;
+    box-shadow:inset 0 0 8px rgba(194,69,45,.25);
+  }
+  h1{
+    font-family:'Ma Shan Zheng',serif;font-weight:400;
+    font-size:clamp(46px,7.5vw,76px);line-height:1.12;letter-spacing:.02em;
+  }
+  .sub{
+    margin-top:6px;font-family:'Caveat',cursive;font-size:22px;color:var(--ink-soft);
+    transform:rotate(-.6deg);
+  }
+  .sub b{color:var(--red);font-weight:400}
+  .squig{display:block;width:min(300px,58vw);margin-top:2px;overflow:visible}
+  .squig path{fill:none;stroke:var(--red);stroke-width:3;stroke-linecap:round}
+
+  /* ---------- 工具条 ---------- */
+  .toolbar{
+    position:sticky;top:14px;z-index:10;margin:30px 0 40px;
+    display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    background:rgba(246,241,227,.92);backdrop-filter:blur(6px);
+    border:1.6px solid var(--ink);border-radius:var(--wobble);
+    padding:12px 18px;box-shadow:5px 6px 0 rgba(43,38,32,.12);
+  }
+  .toolbar label{font-size:16px;white-space:nowrap}
+  #live-text{
+    flex:1;min-width:230px;
+    font-family:'LXGW WenKai',serif;font-size:17px;color:var(--ink);
+    background:var(--paper2);border:1.6px solid var(--ink);
+    border-radius:var(--wobble);padding:8px 16px;outline:none;
+  }
+  #live-text:focus{border-color:var(--red);box-shadow:3px 4px 0 rgba(194,69,45,.18)}
+  .size-box{display:flex;align-items:center;gap:8px;white-space:nowrap}
+  #size{accent-color:var(--red);width:130px}
+
+  /* ---------- 分区 ---------- */
+  section{margin-bottom:56px}
+  h2{
+    font-family:'Zhi Mang Xing',cursive;font-weight:400;
+    font-size:clamp(34px,4.6vw,48px);
+    display:flex;align-items:center;gap:16px;margin-bottom:6px;
+  }
+  h2 .count{
+    font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.08em;
+    color:var(--paper2);background:var(--ink);padding:4px 10px;border-radius:4px;transform:translateY(-4px);
+  }
+  .note{font-size:14.5px;color:var(--red);margin:6px 0 24px;transform:rotate(-.4deg)}
+  .note .kai{font-family:'Ma Shan Zheng',serif}
+
+  /* ---------- 字体卡 ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:30px 24px}
+  .card{
+    position:relative;background:var(--paper2);
+    border:1.6px solid var(--ink);border-radius:var(--wobble);
+    padding:24px 24px 16px;box-shadow:5px 6px 0 rgba(43,38,32,.10);
+    animation:rise .55s cubic-bezier(.22,.9,.36,1) both;animation-delay:var(--d,0s);
+    --r:0deg;
+  }
+  .card:nth-child(odd){--r:-.35deg}
+  .card:nth-child(even){--r:.4deg}
+  .card::before{ /* 胶带 */
+    content:'';position:absolute;top:-13px;left:50%;
+    width:94px;height:25px;transform:translateX(-50%) rotate(-2.5deg);
+    background:var(--tape);
+    border-left:1px dashed rgba(43,38,32,.18);border-right:1px dashed rgba(43,38,32,.18);
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(16px) rotate(var(--r))}to{opacity:1;transform:translateY(0) rotate(var(--r))}}
+  @media (prefers-reduced-motion:reduce){.card{animation:none}}
+
+  .meta{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding-bottom:11px;margin-bottom:13px;border-bottom:1px dashed var(--line)}
+  .fname{
+    font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.07em;
+    background:var(--ink);color:var(--paper2);padding:3px 8px;border-radius:4px;
+    transform:translateY(-1px);
+  }
+  .cname{font-size:16px}
+  .chip{
+    font-size:12.5px;color:var(--red);border:1px solid currentColor;
+    padding:1px 9px;border-radius:999px;opacity:.92;
+  }
+  .sample{
+    font-size:var(--sample-size);line-height:1.42;min-height:2.9em;
+    margin:2px 0 12px;overflow-wrap:anywhere;word-break:break-word;
+  }
+  .alpha{
+    font-size:14px;line-height:1.6;color:var(--ink-soft);
+    border-top:1px dashed var(--line);padding-top:10px;overflow-wrap:anywhere;
+  }
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:12px}
+  .use{font-size:13px;color:var(--ink-soft)}
+  .get{
+    font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;
+    color:var(--red);text-decoration:none;border-bottom:1.6px solid var(--red);padding-bottom:1px;
+  }
+  .get:hover{background:var(--red);color:var(--paper2)}
+
+  /* ---------- 字体栈 ---------- */
+  .f-mashanzheng{font-family:'Ma Shan Zheng','LXGW WenKai',cursive}
+  .f-zhimangxing{font-family:'Zhi Mang Xing','LXGW WenKai',cursive}
+  .f-longcang{font-family:'Long Cang','LXGW WenKai',cursive}
+  .f-liujianmaocao{font-family:'Liu Jian Mao Cao','LXGW WenKai',cursive}
+  .f-zcoolkuaile{font-family:'ZCOOL KuaiLe','LXGW WenKai',cursive}
+  .f-lxgw{font-family:'LXGW WenKai',serif}
+  .f-caveat{font-family:'Caveat','Ma Shan Zheng',cursive}
+  .f-patrick{font-family:'Patrick Hand','Ma Shan Zheng',cursive}
+  .f-kalam{font-family:'Kalam','Ma Shan Zheng',cursive}
+  .f-indie{font-family:'Indie Flower','Ma Shan Zheng',cursive}
+  .f-marker{font-family:'Permanent Marker','Ma Shan Zheng',cursive}
+  .f-rocksalt{font-family:'Rock Salt','Ma Shan Zheng',cursive}
+  .f-amatic{font-family:'Amatic SC','Ma Shan Zheng',cursive}
+  .f-gaegu{font-family:'Gaegu','Ma Shan Zheng',cursive}
+  .f-shadows{font-family:'Shadows Into Light','Ma Shan Zheng',cursive}
+  .f-homemade{font-family:'Homemade Apple','Ma Shan Zheng',cursive}
+
+  /* ---------- 页脚 ---------- */
+  footer{
+    margin:70px 0 50px;padding-top:24px;border-top:1.6px dashed var(--line);
+    font-size:14px;color:var(--ink-soft);line-height:2;
+  }
+  footer a{color:var(--red);text-decoration:none;border-bottom:1px solid currentColor}
+  footer .stamp{font-family:'Caveat',cursive;font-size:20px;color:var(--ink)}
+
+  @media (max-width:640px){
+    .seal{width:46px;height:46px;font-size:16px;top:56px;right:6px}
+    .grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="seal">样<br>张</div>
+    <h1>手写字体样张</h1>
+    <p class="sub">Handwriting Specimen <b>No.001</b> — 改改下面的字，16 款样张实时跟着换 ✎</p>
+    <svg class="squig" viewBox="0 0 300 14" aria-hidden="true">
+      <path d="M3 9 Q 30 3, 60 8 T 120 8 T 180 7 T 240 8 T 297 6"/>
+    </svg>
+  </header>
+
+  <div class="toolbar">
+    <label for="live-text">✎ 改字试试</label>
+    <input id="live-text" type="text" spellcheck="false"
+      value="你好，我是 juan131ng！The quick brown fox jumps over the lazy dog."
+      placeholder="输入任何文字试试…">
+    <div class="size-box">
+      <label for="size">字号</label>
+      <input id="size" type="range" min="28" max="84" value="42">
+    </div>
+  </div>
+
+  <!-- ================= 中文 ================= -->
+  <section>
+    <h2>中文手写 <span class="count">6 款</span></h2>
+    <div class="grid">
+
+      <article class="card" style="--d:.02s">
+        <div class="meta"><span class="fname">MA SHAN ZHENG</span><span class="cname">马善政楷书</span><span class="chip">楷书</span><span class="chip">规整</span></div>
+        <p class="sample f-mashanzheng js-sample"></p>
+        <p class="alpha f-mashanzheng">永和九年，岁在癸丑，暮春之初 0123456789</p>
+        <div class="foot"><span class="use">适合：标题 / 正文两相宜，最稳的一款</span><a class="get" href="https://fonts.google.com/specimen/Ma+Shan+Zheng" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.08s">
+        <div class="meta"><span class="fname">ZHI MANG XING</span><span class="cname">志莽行书</span><span class="chip">行书</span><span class="chip">流畅</span></div>
+        <p class="sample f-zhimangxing js-sample"></p>
+        <p class="alpha f-zhimangxing">永和九年，岁在癸丑，暮春之初 0123456789</p>
+        <div class="foot"><span class="use">适合：大标题 / 封面字，有笔势</span><a class="get" href="https://fonts.google.com/specimen/Zhi+Mang+Xing" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.14s">
+        <div class="meta"><span class="fname">LONG CANG</span><span class="cname">龙藏</span><span class="chip">钢笔</span><span class="chip">细致</span></div>
+        <p class="sample f-longcang js-sample"></p>
+        <p class="alpha f-longcang">永和九年，岁在癸丑，暮春之初 0123456789</p>
+        <div class="foot"><span class="use">适合：标题 / 引言，笔画轻细</span><a class="get" href="https://fonts.google.com/specimen/Long+Cang" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.20s">
+        <div class="meta"><span class="fname">LIU JIAN MAO CAO</span><span class="cname">柳建毛草</span><span class="chip">狂草</span><span class="chip">装饰</span></div>
+        <p class="sample f-liujianmaocao js-sample"></p>
+        <p class="alpha f-liujianmaocao">永和九年，岁在癸丑，暮春之初 0123456789</p>
+        <div class="foot"><span class="use">适合：装饰大字 / 水印，正文勿用</span><a class="get" href="https://fonts.google.com/specimen/Liu+Jian+Mao+Cao" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.26s">
+        <div class="meta"><span class="fname">ZCOOL KUAILE</span><span class="cname">站酷快乐体</span><span class="chip">卡通</span><span class="chip">活泼</span></div>
+        <p class="sample f-zcoolkuaile js-sample"></p>
+        <p class="alpha f-zcoolkuaile">永和九年，岁在癸丑，暮春之初 0123456789</p>
+        <div class="foot"><span class="use">适合：可爱系标签 / 轻松栏目</span><a class="get" href="https://fonts.google.com/specimen/ZCOOL+KuaiLe" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.32s">
+        <div class="meta"><span class="fname">LXGW WENKAI</span><span class="cname">霞鹜文楷</span><span class="chip">楷体</span><span class="chip">易读</span></div>
+        <p class="sample f-lxgw js-sample"></p>
+        <p class="alpha f-lxgw">永和九年，岁在癸丑，暮春之初 0123456789</p>
+        <div class="foot"><span class="use">适合：长文正文（严格说是楷体，但最耐读）</span><a class="get" href="https://github.com/lxgw/LxgwWenKai" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ================= 英文 ================= -->
+  <section>
+    <h2>英文手写 <span class="count">10 款</span></h2>
+    <p class="note">※ 英文手写体都没有汉字——卡片里的中文会自动回退成<span class="kai">「马善政楷」</span>，正好预览博客里真实的中英混排效果。</p>
+    <div class="grid">
+
+      <article class="card" style="--d:.02s">
+        <div class="meta"><span class="fname">CAVEAT</span><span class="cname">圆润连笔</span><span class="chip">批注</span></div>
+        <p class="sample f-caveat js-sample"></p>
+        <p class="alpha f-caveat">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+        <div class="foot"><span class="use">适合：批注 / 副标题，博客最常见</span><a class="get" href="https://fonts.google.com/specimen/Caveat" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.07s">
+        <div class="meta"><span class="fname">PATRICK HAND</span><span class="cname">工整圆珠笔</span><span class="chip">手账</span></div>
+        <p class="sample f-patrick js-sample"></p>
+        <p class="alpha f-patrick">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+        <div class="foot"><span class="use">适合：正文小字也清晰</span><a class="get" href="https://fonts.google.com/specimen/Patrick+Hand" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.12s">
+        <div class="meta"><span class="fname">KALAM</span><span class="cname">圆头醒目</span><span class="chip">标题</span></div>
+        <p class="sample f-kalam js-sample"></p>
+        <p class="alpha f-kalam">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+        <div class="foot"><span class="use">适合：标题 / 边注，笔画略粗</span><a class="get" href="https://fonts.google.com/specimen/Kalam" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.17s">
+        <div class="meta"><span class="fname">INDIE FLOWER</span><span class="cname">清新圆体</span><span class="chip">清新</span></div>
+        <p class="sample f-indie js-sample"></p>
+        <p class="alpha f-indie">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+        <div class="foot"><span class="use">适合：可爱轻松的短句</span><a class="get" href="https://fonts.google.com/specimen/Indie+Flower" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.22s">
+        <div class="meta"><span class="fname">PERMANENT MARKER</span><span class="cname">马克笔</span><span class="chip">大字</span></div>
+        <p class="sample f-marker js-sample"></p>
+        <p class="alpha f-marker">ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789</p>
+        <div class="foot"><span class="use">适合：海报式大标题 / sticker</span><a class="get" href="https://fonts.google.com/specimen/Permanent+Marker" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.27s">
+        <div class="meta"><span class="fname">ROCK SALT</span><span class="cname">石刻涂鸦</span><span class="chip">抖笔</span></div>
+        <p class="sample f-rocksalt js-sample"></p>
+        <p class="alpha f-rocksalt">ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789</p>
+        <div class="foot"><span class="use">适合：涂鸦点缀，勿做长文</span><a class="get" href="https://fonts.google.com/specimen/Rock+Salt" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.32s">
+        <div class="meta"><span class="fname">AMATIC SC</span><span class="cname">瘦高文艺</span><span class="chip">小店</span></div>
+        <p class="sample f-amatic js-sample"></p>
+        <p class="alpha f-amatic">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+        <div class="foot"><span class="use">适合：咖啡店风导航 / 标签</span><a class="get" href="https://fonts.google.com/specimen/Amatic+SC" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.37s">
+        <div class="meta"><span class="fname">GAEGU</span><span class="cname">圆点萌系</span><span class="chip">韩系</span></div>
+        <p class="sample f-gaegu js-sample"></p>
+        <p class="alpha f-gaegu">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+        <div class="foot"><span class="use">适合：日记感 / 轻博客</span><a class="get" href="https://fonts.google.com/specimen/Gaegu" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.42s">
+        <div class="meta"><span class="fname">SHADOWS INTO LIGHT</span><span class="cname">轻盈日记</span><span class="chip">细笔</span></div>
+        <p class="sample f-shadows js-sample"></p>
+        <p class="alpha f-shadows">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</p>
+        <div class="foot"><span class="use">适合：手写引言 / 签名</span><a class="get" href="https://fonts.google.com/specimen/Shadows+Into+Light" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+      <article class="card" style="--d:.47s">
+        <div class="meta"><span class="fname">HOMEMADE APPLE</span><span class="cname">优雅草写</span><span class="chip">长句</span></div>
+        <p class="sample f-homemade js-sample"></p>
+        <p class="alpha f-homemade">ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789</p>
+        <div class="foot"><span class="use">适合：一整行长引言 / 信件感</span><a class="get" href="https://fonts.google.com/specimen/Homemade+Apple" target="_blank" rel="noopener">GET ↗</a></div>
+      </article>
+
+    </div>
+  </section>
+
+  <footer>
+    <p><span class="stamp">All free & open-source ✎</span></p>
+    <p>本页 16 款全部免费可商用：Google Fonts 系为 OFL 协议（<a href="https://fonts.google.com/category/Handwriting" target="_blank" rel="noopener">Handwriting 分类直达</a>）；<a href="https://github.com/lxgw/LxgwWenKai" target="_blank" rel="noopener">霞鹜文楷</a>同为 OFL。中文字体走分片加载，首次打开需联网。</p>
+    <p>想找更多？中文手写体可在 <a href="https://www.hellofont.cn" target="_blank" rel="noopener">字由</a> 里筛「手写风」。</p>
+    <p class="stamp" style="transform:rotate(-1deg);display:inline-block;margin-top:6px">rendered with ❤ on paper — juan131ng</p>
+  </footer>
+</div>
+
+<script>
+  const input = document.getElementById('live-text');
+  const samples = Array.from(document.querySelectorAll('.js-sample'));
+  const sync = () => {
+    const text = input.value || input.placeholder;
+    samples.forEach(el => { el.textContent = text; });
+  };
+  input.addEventListener('input', sync);
+
+  const size = document.getElementById('size');
+  size.addEventListener('input', () => {
+    document.documentElement.style.setProperty('--sample-size', size.value + 'px');
+  });
+
+  sync();
+</script>
+</body>
+</html>

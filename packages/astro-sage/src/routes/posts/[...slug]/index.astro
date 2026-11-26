@@ -170,17 +170,19 @@ const ogImage = ogImageUrl
       <article id="article" class="app-prose post-body">
         <Content />
       </article>
-      <QuoteShare
-        url={
-          new URL(
-            getPostUrl(post.id, post.filePath, locale),
-            Astro.site ?? Astro.url
-          ).href
-        }
-        title={title}
-        eyebrow={series ?? config.site.title}
-        footer={`${post.data.author} · ${new URL(config.site.url).hostname}`}
-      />
+      {config.shareLinks.length > 0 && (
+        <QuoteShare
+          url={
+            new URL(
+              getPostUrl(post.id, post.filePath, locale),
+              Astro.site ?? Astro.url
+            ).href
+          }
+          title={title}
+          eyebrow={series ?? config.site.title}
+          footer={`${post.data.author} · ${new URL(config.site.url).hostname}`}
+        />
+      )}
 
       {showToc && (
         <aside class="post-rail" aria-label="Table of contents">
@@ -208,7 +210,7 @@ const ogImage = ogImageUrl
         )}
 
         <div class="flex flex-wrap items-center justify-between gap-4">
-          <ShareLinks title={title} />
+          {config.shareLinks.length > 0 && <ShareLinks title={title} />}
           <EditPost {hideEditPost} {post} />
         </div>
 

@@ -91,7 +91,7 @@ Schema: [`packages/astro-sage/src/content.ts`](packages/astro-sage/src/content.t
 | `draft` | — | Never built |
 | `ogImage` | generated | Image import or URL |
 | `canonicalURL`, `timezone`, `hideEditPost` | — | |
-| `toc` | `true` | Pinned table of contents |
+| `toc` | `false` | Opt-in table of contents |
 | `math` | `true` | Load KaTeX CSS; set `false` on posts without math |
 | `cite` | `true` | "Cite this post" block |
 | `comments` | `true` | Comments (when a provider is configured) |

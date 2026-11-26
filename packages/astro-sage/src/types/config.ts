@@ -184,7 +184,7 @@ export interface SageConfig {
   features?: FeaturesConfig;
   /** Social profile links shown in header/footer */
   socials?: SocialLink[];
-  /** Share links shown on post detail pages */
+  /** Share controls on posts; set to [] to disable the share toolbar and quote sharing. */
   shareLinks?: ShareLink[];
 }
 

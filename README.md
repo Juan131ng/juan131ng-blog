@@ -105,7 +105,7 @@ pubDatetime: 2026-10-15T09:00:00Z
 tags: ["ml", "transformers"]
 series: "Reading papers"   # optional
 featured: true             # optional
-toc: true                  # default true
+toc: true                  # opt in; default false
 math: true                 # default true; set false to skip KaTeX CSS
 comments: true             # default true (when comments are configured)
 cite: true                 # default true: show the "Cite this post" block
