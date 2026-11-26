@@ -4,8 +4,7 @@ export default defineSageConfig({
   site: {
     url: "https://juan131ng.zeroarea.top/",
     title: "Juan131ng",
-    description:
-      "这里存放一部分我",
+    description: "这里存放一部分我",
     author: "Juan131ng",
     profile: "https://github.com/Juan131ng",
     ogImage: "default-og.jpg",
@@ -15,8 +14,7 @@ export default defineSageConfig({
   },
   home: {
     title: "你好，我是卷饼",
-    intro:
-      "这里存放一部分我。",
+    intro: "这里存放一部分我。",
   },
   comments: { provider: false },
   shareLinks: [],
